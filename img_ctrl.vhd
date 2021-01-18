@@ -114,7 +114,6 @@ architecture bhv of img_ctrl is
         constant color_32_r: std_logic_vector(7 downto 0):= x"79";
         constant color_32_g: std_logic_vector(7 downto 0):= x"55";
         constant color_32_b: std_logic_vector(7 downto 0):= x"48";
-
 begin
     img_ctrl: process(clk, rst)
         variable x_tmp, y_tmp: integer range 1 to 70;
