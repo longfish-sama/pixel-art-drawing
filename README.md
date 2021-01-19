@@ -25,5 +25,5 @@ a FPGA based pixel drawing platform
 5. LED digital display
     - pointer_to_smg_data.vhd
     - smg_6.vhd
-6. 
+6. ctr
 
