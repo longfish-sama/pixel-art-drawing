@@ -14,7 +14,8 @@ end entity ps2_read;
 
 architecture bhv of ps2_read is
     signal data_tmp: std_logic_vector(7 downto 0);
-    signal read_done: std_logic;    
+    signal read_done_tmp: std_logic;
+    signal read_done: std_logic;
 begin
     com: process(clk_ps2, rst)
         variable bit_tmp: std_logic;
@@ -24,14 +25,14 @@ begin
         if rst= '0' then
             state:= s0;
             data_tmp<= "00000000";
-            read_done<= '0';
+            read_done_tmp<= '0';
         elsif falling_edge(clk_ps2) then
             case state is
                 when s0 =>
                     bit_tmp:= data_in_ps2;
                     if bit_tmp='0' then
                         state:= s1;
-                        read_done<= '0';
+                        read_done_tmp<= '0';
                     else
                         state:= s0;
                     end if;
@@ -68,22 +69,35 @@ begin
                     state:= s9;
                 when s9 =>
                     bit_tmp:= bit_tmp xor data_in_ps2;
-                    if bit_tmp='1' then
+                    --if bit_tmp='1' then
                         state:= s10;
-                    else
-                        state:= s10;
-                    end if;
+                    --else
+                        --state:= s10;
+                    --end if;
                 when s10 =>
                     bit_tmp:= data_in_ps2;
-                    if bit_tmp='1' then
-                        read_done<= '1';
-                    else
-                        read_done<= '0';
-                    end if;
+                    --if bit_tmp='1' then
+                        read_done_tmp<= '1';
+                    --else
+                        --read_done_tmp<= '0';
+                    --end if;
                     state:= s0;
             end case;
         end if;
     end process com;
+
+    read_done_flag: process(clk_sys, rst, read_done_tmp)
+    begin
+        if rst = '0' then
+            read_done<= '0';
+        elsif rising_edge(clk_sys) then
+            if read_done_tmp= '1' then
+                read_done<= '1';
+            else
+                read_done<= '0';
+            end if;
+        end if;
+    end process read_done_flag;
 
     data_out: process(clk_sys, rst)
     begin

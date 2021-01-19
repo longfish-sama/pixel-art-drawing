@@ -19,36 +19,20 @@ end entity ps2_decode;
 ----------------
 
 architecture bhv of ps2_decode is
-    type state_type is (s0, s1, s2);
-    signal p_state, n_state: state_type;
 begin
-    seq: process(clk_sys, rst)
-    begin
-        if rst= '0' then
-            p_state<= s0;
-        elsif rising_edge(clk_sys) then
-            p_state<= n_state;
-        end if;
-    end process seq;
-    com: process(p_state, code_in_ps2)
+    decode: process(clk_sys, rst)
+        variable flag_end: std_logic;
         variable code_in_tmp: std_logic_vector(7 downto 0);
     begin
-        key_code_out<= "0000";
-        case p_state is
-            when s0 =>
-                if code_in_ps2= "11110000" then
-                    n_state<= s1;
-                else
-                    n_state<= s0;
-                end if;
-            when s1 =>
-                code_in_tmp:= code_in_ps2;
-                if code_in_tmp/= "11110000" then
-                    n_state<= s2;
-                else
-                    n_state<= s1;
-                end if;
-            when s2 =>
+        if rst = '0' then
+            flag_end:= '0';
+            code_in_tmp:= "00000000";
+            key_code_out<= "0000";
+        elsif rising_edge(clk_sys) then
+            code_in_tmp:= code_in_ps2;
+            if code_in_tmp= "11110000" then
+                flag_end:= '1';
+            elsif flag_end= '1' then
                 case code_in_tmp is
                     when "00101001" => --key space
                         key_code_out<= "0001";
@@ -63,7 +47,11 @@ begin
                     when others =>
                         key_code_out<= "0000";
                 end case;
-                n_state<= s0;
-        end case;
-    end process com;
+                flag_end:= '0';
+            else
+                flag_end:= '0';
+                key_code_out<= "0000";
+            end if;
+        end if;
+    end process decode;
 end architecture bhv;

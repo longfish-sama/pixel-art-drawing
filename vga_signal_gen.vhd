@@ -24,17 +24,18 @@ architecture bhv of vga_signal_gen is
     signal h_active_flag, v_active_flag: std_logic; -- horizontal& vertical video active flag
     signal video_active_flag: std_logic; -- video active (when horizontal active and vertical active)
     signal video_active_flag_delay: std_logic; -- delay 1 clock of video active flag
+    signal delta: integer range 0 to 7;
     -- 800*600 at 60fps, clk_pix= 40MHz
-        constant h_active: integer:= 800; -- horizontal active time (pixels)
-        constant h_blank_fproch: integer:= 40; -- horizontal front porch (pixels)
-        constant h_blank_sync: integer:= 128; -- horizontal sync time(pixels)
-        constant h_blank_bproch: integer:= 88; -- horizontal back porch (pixels)
-        constant v_active: integer:= 600; -- vertical active Time (lines)
-        constant v_blank_fproch: integer:= 1; -- vertical front porch (lines)
-        constant v_blank_sync: integer:= 4; -- vertical sync time (lines)
-        constant v_blank_bproch: integer:= 23; -- vertical back porch (lines)
-        constant h_total: integer:= h_active+ h_blank_fproch+ h_blank_sync+ h_blank_bproch; -- horizontal total time (pixels)
-        constant v_total: integer:= v_active+ v_blank_fproch+ v_blank_sync+ v_blank_bproch; -- vertical total time (lines)
+        signal h_active: integer range 0 to 2000; -- horizontal active time (pixels)
+        signal h_blank_fproch: integer range 0 to 120; -- horizontal front porch (pixels)
+        signal h_blank_sync: integer range 0 to 200; -- horizontal sync time(pixels)
+        signal h_blank_bproch: integer range 0 to 350; -- horizontal back porch (pixels)
+        signal v_active: integer range 0 to 2000; -- vertical active Time (lines)
+        signal v_blank_fproch: integer range 0 to 7; -- vertical front porch (lines)
+        signal v_blank_sync: integer range 0 to 7; -- vertical sync time (lines)
+        signal v_blank_bproch: integer range 0 to 60; -- vertical back porch (lines)
+        signal h_total: integer range 0 to 3000; -- horizontal total time (pixels)
+        signal v_total: integer range 0 to 3000; -- vertical total time (lines)
     -- define rgb value of 32 colors
         constant color_1_r: std_logic_vector(7 downto 0):= x"ff";
         constant color_1_g: std_logic_vector(7 downto 0):= x"ff";
@@ -135,9 +136,9 @@ architecture bhv of vga_signal_gen is
         constant color_back_r: std_logic_vector(7 downto 0):= x"f0";
         constant color_back_g: std_logic_vector(7 downto 0):= x"f0";
         constant color_back_b: std_logic_vector(7 downto 0):= x"f0";
-        constant color_sel_r: std_logic_vector(7 downto 0):= x"cd";
-        constant color_sel_g: std_logic_vector(7 downto 0):= x"cd";
-        constant color_sel_b: std_logic_vector(7 downto 0):= x"cd";
+        constant color_sel_r: std_logic_vector(7 downto 0):= x"ff";
+        constant color_sel_g: std_logic_vector(7 downto 0):= x"00";
+        constant color_sel_b: std_logic_vector(7 downto 0):= x"00";
 
 begin
     hor_sync<= hor_sync_delay_tmp;
@@ -147,6 +148,17 @@ begin
     vga_r<= vga_r_tmp;
     vga_g<= vga_g_tmp;
     vga_b<= vga_b_tmp;
+    h_active<= 800; -- horizontal active time (pixels)
+    h_blank_fproch<= 40; -- horizontal front porch (pixels)
+    h_blank_sync<= 128; -- horizontal sync time(pixels)
+    h_blank_bproch<= 88; -- horizontal back porch (pixels)
+    v_active<= 600; -- vertical active Time (lines)
+    v_blank_fproch<= 1; -- vertical front porch (lines)
+    v_blank_sync<= 4; -- vertical sync time (lines)
+    v_blank_bproch<= 23; -- vertical back porch (lines)
+    h_total<= h_active+ h_blank_fproch+ h_blank_sync+ h_blank_bproch; -- horizontal total time (pixels)
+    v_total<= v_active+ v_blank_fproch+ v_blank_sync+ v_blank_bproch; -- vertical total time (lines)
+    delta<= 1;
 
     sync_active_flag_gen: process(clk_pix, rst_n)
     -- gen hor_sync, ver_sync and de signal
@@ -301,11 +313,16 @@ begin
                 x_tmp:= conv_integer(x_point);
                 y_tmp:= conv_integer(y_point);
                 color_tmp:= conv_integer(color_num);
-                if (x_cur_pos>= h_active/7+ x_tmp*h_active/128) and (y_cur_pos>= 41/1080*v_active+ y_tmp*3/216*v_active) and (x_cur_pos< h_active/7+ x_tmp*h_active/128+2) and (y_cur_pos< 11/270*v_active+ y_tmp*3/216*v_active+30) then
-                    --drawing area pointer
-                    vga_r_tmp<= color_sel_r;
-                    vga_g_tmp<= color_sel_g;
-                    vga_b_tmp<= color_sel_b;
+                if (x_tmp<= 64 and y_tmp<= 64 and (x_cur_pos>= h_active*97/640+ x_tmp*h_active/128) and (y_cur_pos>= v_active*41/1080+ y_tmp*v_active/72) and (x_cur_pos< h_active*49/320+ x_tmp*h_active/128) and (y_cur_pos< v_active*11/270+ y_tmp*v_active/72)) then
+                        --drawing area pointer
+                        vga_r_tmp<= color_sel_r;
+                        vga_g_tmp<= color_sel_g;
+                        vga_b_tmp<= color_sel_b;
+                elsif (x_tmp> 64 and y_tmp<= 16 and (x_cur_pos>= x_tmp*h_active*3/96- h_active*1211/960) and (y_cur_pos>= v_active/135+ y_tmp*v_active/18) and (x_cur_pos< x_tmp*h_active/48+ x_tmp*h_active/96- h_active*403/320) and (y_cur_pos< v_active/90+ y_tmp*v_active*3/54)) then
+                        vga_r_tmp<= color_sel_r;
+                        vga_g_tmp<= color_sel_g;
+                        vga_b_tmp<= color_sel_b;
+                elsif 
                 else
                     vga_r_tmp<= color_back_r;
                     vga_g_tmp<= color_back_g;
