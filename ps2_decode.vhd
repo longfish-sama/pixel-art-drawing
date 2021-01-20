@@ -11,8 +11,8 @@ entity ps2_decode is
 end entity ps2_decode;
 ----------------
 -- key_code_out    btn     - key_code_out   btn
--- 0001            space   - 0110
--- 0010            up      - 0111
+-- 0001            space   - 0110           pgup
+-- 0010            up      - 0111           pgdn
 -- 0011            down    - 1000
 -- 0100            left    - 1001
 -- 0101            right   - 1010
@@ -44,6 +44,10 @@ begin
                         key_code_out<= "0011";
                     when "01110100" => --key right
                         key_code_out<= "0101";
+                    when "01111101" => --key pgup
+                        key_code_out<= "0110";
+                    when "01111010" => --key pgdn
+                        key_code_out<= "0111";
                     when others =>
                         key_code_out<= "0000";
                 end case;
