@@ -35,8 +35,8 @@ architecture bhv of vga_signal_gen is
     constant v_blank_bproch: integer:= 23; -- vertical back porch (lines)
     constant h_total: integer:= h_active+ h_blank_fproch+ h_blank_sync+ h_blank_bproch; -- horizontal total time (pixels)
     constant v_total: integer:= v_active+ v_blank_fproch+ v_blank_sync+ v_blank_bproch; -- vertical total time (lines)
-    constant line_w: integer:= 1;
--- 800*600 gird locs
+    constant line_w: integer:= 0;
+-- 800*600 gird locs (calculated in Excel)
     constant x1: integer:= 125; -- drawing area locs
     constant x2: integer:= 131;
     constant x3: integer:= 138;
@@ -101,8 +101,8 @@ architecture bhv of vga_signal_gen is
     constant x62: integer:= 506;
     constant x63: integer:= 513;
     constant x64: integer:= 519;
-    constant x65_color: integer:= 608; -- color area locs
-    constant x66_color: integer:= 633;
+    constant x1_color: integer:= 608; -- color area locs
+    constant x2_color: integer:= 633;
     constant y1: integer:= 28; -- drawing area locs
     constant y2: integer:= 36;
     constant y3: integer:= 44;
@@ -183,6 +183,8 @@ architecture bhv of vga_signal_gen is
     constant y14_color: integer:= 461;
     constant y15_color: integer:= 494;
     constant y16_color: integer:= 528;
+    constant x_color_width: integer:= 17;
+    constant y_color_width: integer:= 22;
 -- define rgb value of colors
     constant color_1_r: std_logic_vector(7 downto 0):= x"ff";
     constant color_1_g: std_logic_vector(7 downto 0):= x"ff";
@@ -552,28 +554,23 @@ begin
                         color_tmp_row:= 15;
                         color_tmp_col:= 1;
                 end case;
-                if (x_tmp<= 64 and y_tmp<= 64 and
+                if      -- drawing area pointer
+                        (x_tmp<= 64 and y_tmp<= 64 and
                         (x_cur_pos>= h_active*97/640+ x_tmp*h_active/128) and (y_cur_pos>= v_active*41/1080+ y_tmp*v_active/72) and
-                        (x_cur_pos< h_active*49/320+ x_tmp*h_active/128) and (y_cur_pos< v_active*11/270+ y_tmp*v_active/72)) then
-                    -- drawing area pointer
-                    vga_r_tmp<= color_sel_r;
-                    vga_g_tmp<= color_sel_g;
-                    vga_b_tmp<= color_sel_b;
-                elsif (x_tmp> 64 and y_tmp<= 16 and
+                        (x_cur_pos< h_active*49/320+ x_tmp*h_active/128) and (y_cur_pos< v_active*11/270+ y_tmp*v_active/72)) or
+                        -- color area pointer
+                        (x_tmp> 64 and y_tmp<= 16 and
                         (x_cur_pos>= x_tmp*h_active*3/96- h_active*1211/960) and (y_cur_pos>= v_active/135+ y_tmp*v_active/18) and
-                        (x_cur_pos< x_tmp*h_active/48+ x_tmp*h_active/96- h_active*403/320) and (y_cur_pos< v_active/90+ y_tmp*v_active*3/54)) then
-                    -- color area pointer
-                    vga_r_tmp<= color_sel_r;
-                    vga_g_tmp<= color_sel_g;
-                    vga_b_tmp<= color_sel_b;
-                elsif (color_tmp>= 1 and color_tmp<= 32 and
+                        (x_cur_pos< x_tmp*h_active/48+ x_tmp*h_active/96- h_active*403/320) and (y_cur_pos< v_active/90+ y_tmp*v_active*3/54)) or
+                        -- color area selector
+                        (color_tmp>= 1 and color_tmp<= 32 and
                         (x_cur_pos>= h_active*73/96+ color_tmp_col*h_active/32) and (x_cur_pos< h_active*25/32+ color_tmp_col*h_active/32) and
                         (y_cur_pos>= v_active/12+ color_tmp_row*v_active/18- 3) and (y_cur_pos< v_active/12+ color_tmp_row*v_active/18)) then
-                    -- color area select
                     vga_r_tmp<= color_sel_r;
                     vga_g_tmp<= color_sel_g;
                     vga_b_tmp<= color_sel_b;
-                elsif (((x_cur_pos>= x1 and x_cur_pos<= x1+ line_w) or (x_cur_pos>= x2 and x_cur_pos<= x2+ line_w) or
+                elsif   -- drawing area ver line
+                        (((x_cur_pos>= x1 and x_cur_pos<= x1+ line_w) or (x_cur_pos>= x2 and x_cur_pos<= x2+ line_w) or
                         (x_cur_pos>= x3 and x_cur_pos<= x3+ line_w) or (x_cur_pos>= x4 and x_cur_pos<= x4+ line_w) or
                         (x_cur_pos>= x5 and x_cur_pos<= x5+ line_w) or (x_cur_pos>= x6 and x_cur_pos<= x6+ line_w) or
                         (x_cur_pos>= x7 and x_cur_pos<= x7+ line_w) or (x_cur_pos>= x8 and x_cur_pos<= x8+ line_w) or
@@ -605,7 +602,8 @@ begin
                         (x_cur_pos>= x59 and x_cur_pos<= x59+ line_w) or (x_cur_pos>= x60 and x_cur_pos<= x60+ line_w) or
                         (x_cur_pos>= x61 and x_cur_pos<= x61+ line_w) or (x_cur_pos>= x62 and x_cur_pos<= x62+ line_w) or
                         (x_cur_pos>= x63 and x_cur_pos<= x63+ line_w) or (x_cur_pos>= x64 and x_cur_pos<= x64+ line_w) or
-                        (x_cur_pos>= x64*2-x63 and x_cur_pos<= x64*2-x63+line_w)) and y_cur_pos>=y1 and y_cur_pos<= y64*2-y63) or
+                        (x_cur_pos>= x64*2- x63 and x_cur_pos<= x64*2- x63+ line_w)) and y_cur_pos>=y1 and y_cur_pos<= y64*2- y63) or
+                        -- drawing area hor line
                         (((y_cur_pos>= y1 and y_cur_pos<= y1+ line_w) or (y_cur_pos>= y2 and y_cur_pos<= y2+ line_w) or
                         (y_cur_pos>= y3 and y_cur_pos<= y3+ line_w) or (y_cur_pos>= y4 and y_cur_pos<= y4+ line_w) or
                         (y_cur_pos>= y5 and y_cur_pos<= y5+ line_w) or (y_cur_pos>= y6 and y_cur_pos<= y6+ line_w) or
@@ -638,7 +636,36 @@ begin
                         (y_cur_pos>= y59 and y_cur_pos<= y59+ line_w) or (y_cur_pos>= y60 and y_cur_pos<= y60+ line_w) or
                         (y_cur_pos>= y61 and y_cur_pos<= y61+ line_w) or (y_cur_pos>= y62 and y_cur_pos<= y62+ line_w) or
                         (y_cur_pos>= y63 and y_cur_pos<= y63+ line_w) or (y_cur_pos>= y64 and y_cur_pos<= y64+ line_w) or
-                        (y_cur_pos>= y64*2-y63 and y_cur_pos<= y64*2-y63+line_w)) and x_cur_pos>= x1 and x_cur_pos<= x64*2-x63) then
+                        (y_cur_pos>= y64*2- y63 and y_cur_pos<= y64*2- y63+ line_w)) and x_cur_pos>= x1 and x_cur_pos<= x64*2- x63) or
+                        -- color area ver line
+                        (((x_cur_pos>= x1_color and x_cur_pos<= x1_color+ line_w) or (x_cur_pos>= x1_color+ x_color_width and x_cur_pos<= x1_color+ x_color_width+ line_w) or
+                        (x_cur_pos>= x2_color and x_cur_pos<= x2_color+ line_w) or (x_cur_pos>= x2_color+ x_color_width and x_cur_pos<= x2_color+ x_color_width+ line_w)) and
+                        ((y_cur_pos>= y1_color and y_cur_pos<= y1_color+ y_color_width) or (y_cur_pos>= y2_color and y_cur_pos<= y2_color+ y_color_width) or
+                        (y_cur_pos>= y3_color and y_cur_pos<= y3_color+ y_color_width) or (y_cur_pos>= y4_color and y_cur_pos<= y4_color+ y_color_width) or
+                        (y_cur_pos>= y5_color and y_cur_pos<= y5_color+ y_color_width) or (y_cur_pos>= y6_color and y_cur_pos<= y6_color+ y_color_width) or
+                        (y_cur_pos>= y7_color and y_cur_pos<= y7_color+ y_color_width) or (y_cur_pos>= y8_color and y_cur_pos<= y8_color+ y_color_width) or
+                        (y_cur_pos>= y9_color and y_cur_pos<= y9_color+ y_color_width) or (y_cur_pos>= y10_color and y_cur_pos<= y10_color+ y_color_width) or
+                        (y_cur_pos>= y11_color and y_cur_pos<= y11_color+ y_color_width) or (y_cur_pos>= y12_color and y_cur_pos<= y12_color+ y_color_width) or
+                        (y_cur_pos>= y13_color and y_cur_pos<= y13_color+ y_color_width) or (y_cur_pos>= y14_color and y_cur_pos<= y14_color+ y_color_width) or
+                        (y_cur_pos>= y15_color and y_cur_pos<= y15_color+ y_color_width) or (y_cur_pos>= y16_color and y_cur_pos<= y16_color+ y_color_width))) or
+                        -- color area hor line
+                        (((y_cur_pos>= y1_color and y_cur_pos<= y1_color+ line_w) or (y_cur_pos>= y1_color+ y_color_width and y_cur_pos<= y1_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y2_color and y_cur_pos<= y2_color+ line_w) or (y_cur_pos>= y2_color+ y_color_width and y_cur_pos<= y2_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y3_color and y_cur_pos<= y3_color+ line_w) or (y_cur_pos>= y3_color+ y_color_width and y_cur_pos<= y3_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y4_color and y_cur_pos<= y4_color+ line_w) or (y_cur_pos>= y4_color+ y_color_width and y_cur_pos<= y4_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y5_color and y_cur_pos<= y5_color+ line_w) or (y_cur_pos>= y5_color+ y_color_width and y_cur_pos<= y5_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y6_color and y_cur_pos<= y6_color+ line_w) or (y_cur_pos>= y6_color+ y_color_width and y_cur_pos<= y6_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y7_color and y_cur_pos<= y7_color+ line_w) or (y_cur_pos>= y7_color+ y_color_width and y_cur_pos<= y7_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y8_color and y_cur_pos<= y8_color+ line_w) or (y_cur_pos>= y8_color+ y_color_width and y_cur_pos<= y8_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y9_color and y_cur_pos<= y9_color+ line_w) or (y_cur_pos>= y9_color+ y_color_width and y_cur_pos<= y9_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y10_color and y_cur_pos<= y10_color+ line_w) or (y_cur_pos>= y10_color+ y_color_width and y_cur_pos<= y10_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y11_color and y_cur_pos<= y11_color+ line_w) or (y_cur_pos>= y11_color+ y_color_width and y_cur_pos<= y11_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y12_color and y_cur_pos<= y12_color+ line_w) or (y_cur_pos>= y12_color+ y_color_width and y_cur_pos<= y12_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y13_color and y_cur_pos<= y13_color+ line_w) or (y_cur_pos>= y13_color+ y_color_width and y_cur_pos<= y13_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y14_color and y_cur_pos<= y14_color+ line_w) or (y_cur_pos>= y14_color+ y_color_width and y_cur_pos<= y14_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y15_color and y_cur_pos<= y15_color+ line_w) or (y_cur_pos>= y15_color+ y_color_width and y_cur_pos<= y15_color+ y_color_width+ line_w) or
+                        (y_cur_pos>= y16_color and y_cur_pos<= y16_color+ line_w) or (y_cur_pos>= y16_color+ y_color_width and y_cur_pos<= y16_color+ y_color_width+ line_w)) and
+                        ((x_cur_pos>= x1_color and x_cur_pos<= x1_color+ x_color_width) or (x_cur_pos>= x2_color and x_cur_pos<= x2_color+ x_color_width))) then
                     -- gird
                     vga_r_tmp<= color_sel_r;
                     vga_g_tmp<= color_sel_g;
