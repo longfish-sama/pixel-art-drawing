@@ -9,7 +9,8 @@ entity vga_signal_gen is
         clk_pix, rst_n: in std_logic;
         x_point, y_point, color_num: in std_logic_vector(7 downto 0);
         hor_sync, ver_sync, de: out std_logic;
-        vga_r, vga_g, vga_b: out std_logic_vector(7 downto 0)
+        vga_r, vga_g, vga_b: out std_logic_vector(7 downto 0);
+        img_ram_add: out std_logic_vector(7 downto 0)
     );
 end entity vga_signal_gen;
 
