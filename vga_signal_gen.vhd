@@ -36,6 +36,8 @@ architecture bhv of vga_signal_gen is
     constant h_total: integer:= h_active+ h_blank_fproch+ h_blank_sync+ h_blank_bproch; -- horizontal total time (pixels)
     constant v_total: integer:= v_active+ v_blank_fproch+ v_blank_sync+ v_blank_bproch; -- vertical total time (lines)
     constant line_w: integer:= 0;
+    constant dot_w: integer:= 1;
+    constant selector_w: integer:= 3;
 -- 800*600 gird locs (calculated in Excel)
     constant x1: integer:= 125; -- drawing area locs
     constant x2: integer:= 131;
@@ -556,16 +558,16 @@ begin
                 end case;
                 if      -- drawing area pointer
                         (x_tmp<= 64 and y_tmp<= 64 and
-                        (x_cur_pos>= h_active*97/640+ x_tmp*h_active/128) and (y_cur_pos>= v_active*41/1080+ y_tmp*v_active/72) and
-                        (x_cur_pos< h_active*49/320+ x_tmp*h_active/128) and (y_cur_pos< v_active*11/270+ y_tmp*v_active/72)) or
+                        (x_cur_pos>= h_active*39/256+ x_tmp*h_active/128- dot_w) and (y_cur_pos>= v_active*17/432+ y_tmp*v_active/72- dot_w) and
+                        (x_cur_pos<= h_active*39/256+ x_tmp*h_active/128+ dot_w) and (y_cur_pos<= v_active*17/432+ y_tmp*v_active/72+ dot_w)) or
                         -- color area pointer
                         (x_tmp> 64 and y_tmp<= 16 and
-                        (x_cur_pos>= x_tmp*h_active*3/96- h_active*1211/960) and (y_cur_pos>= v_active/135+ y_tmp*v_active/18) and
-                        (x_cur_pos< x_tmp*h_active/48+ x_tmp*h_active/96- h_active*403/320) and (y_cur_pos< v_active/90+ y_tmp*v_active*3/54)) or
-                        -- color area selector
+                        (x_cur_pos>= x_tmp*h_active/32- h_active*121/96- dot_w) and (y_cur_pos>= v_active/108+ y_tmp*v_active/18- dot_w) and
+                        (x_cur_pos<= x_tmp*h_active/32- h_active*121/96+ dot_w) and (y_cur_pos<= v_active/108+ y_tmp*v_active/18- dot_w)) or
+                        -- color area selectors
                         (color_tmp>= 1 and color_tmp<= 32 and
                         (x_cur_pos>= h_active*73/96+ color_tmp_col*h_active/32) and (x_cur_pos< h_active*25/32+ color_tmp_col*h_active/32) and
-                        (y_cur_pos>= v_active/12+ color_tmp_row*v_active/18- 3) and (y_cur_pos< v_active/12+ color_tmp_row*v_active/18)) then
+                        (y_cur_pos>= v_active/12+ color_tmp_row*v_active/18- selector_w) and (y_cur_pos< v_active/12+ color_tmp_row*v_active/18)) then
                     vga_r_tmp<= color_sel_r;
                     vga_g_tmp<= color_sel_g;
                     vga_b_tmp<= color_sel_b;
