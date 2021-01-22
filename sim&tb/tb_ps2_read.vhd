@@ -12,7 +12,7 @@ architecture bhv of tb_ps2_read is
     signal rst: std_logic;
     signal data_out_ps2: std_logic_vector(7 downto 0);
     signal key_code_out:std_logic_vector(3 downto 0);
-    component ps2_read
+    component ps2_read_2
     port(
         clk_sys: in std_logic;
         clk_ps2: in std_logic;
@@ -27,7 +27,7 @@ architecture bhv of tb_ps2_read is
         key_code_out: out std_logic_vector(3 downto 0)
     ); end component;
 begin
-    u1:ps2_read
+    u1:ps2_read_2
     port map(
         clk_ps2=> clk_ps2,
         clk_sys=> clk_sys,
