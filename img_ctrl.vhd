@@ -123,7 +123,7 @@ begin
     begin
         if rst = '0' then
             add_wr<= (others => '0');
-            img_data<= (others => '0');
+            img_data<= (others => '1');
             wr_en<= '0';
             x_tmp:= 65;
             y_tmp:= 1;
@@ -266,10 +266,10 @@ begin
                             color_g:= color_32_g;
                             color_b:= color_32_b;
                     end case;
+                    wr_en<= '1';
+                    add_wr<= conv_std_logic_vector(add_wr_tmp, add_wr'length);
+                    img_data<= color_r& color_g& color_b;    
                 end if;
-                wr_en<= '1';
-                add_wr<= conv_std_logic_vector(add_wr_tmp, add_wr'length);
-                img_data<= color_r& color_g& color_b;
             end if;
         end if;
     end process img_ctrl;
