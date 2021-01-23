@@ -16,13 +16,13 @@ architecture bhv of pointer is
 --    signal p_state, n_state: state_type;
 begin
     point: process(clk_sys, rst, key_code)
-        variable x_tmp, y_tmp: integer range 0 to 70;
+        variable x_tmp, y_tmp: integer range 0 to 35;
         variable key_code_tmp: std_logic_vector(3 downto 0);
     begin
         if rst = '0' then
-            x_tmp:= 65;
+            x_tmp:= 33;
             y_tmp:= 1;
-            x_point<= conv_std_logic_vector(65, x_point'length);
+            x_point<= conv_std_logic_vector(33, x_point'length);
             y_point<= conv_std_logic_vector(1, y_point'length);
         elsif rising_edge(clk_sys) then
             key_code_tmp:= key_code;
@@ -32,23 +32,26 @@ begin
                         y_tmp:= y_tmp- 1;
                     end if;
                 when "0011" => -- key down
-                    if x_tmp>= 1 and x_tmp<= 64 and y_tmp<= 63 then
+                    if x_tmp>= 1 and x_tmp<= 32 and y_tmp<= 31 then
                         y_tmp:= y_tmp+ 1;
-                    elsif x_tmp>= 65 and x_tmp<= 66 and y_tmp<= 15 then
+                    elsif x_tmp>= 33 and x_tmp<= 34 and y_tmp<= 15 then
                         y_tmp:= y_tmp+ 1;
                     end if;
                 when "0100" => -- key left
-                    if x_tmp>= 2 then
+                    if (x_tmp>= 2 and x_tmp<= 32) or x_tmp=34 then
                         x_tmp:= x_tmp- 1;
+                    elsif x_tmp= 33 and y_tmp>= 1 and y_tmp<= 16 then
+                        x_tmp:= 32;
+                        y_tmp:= y_tmp*2- 1;
                     end if;
                 when "0101" => -- key right
-                    if y_tmp>= 1 and y_tmp<= 16 and x_tmp<= 65 then
+                    if y_tmp>= 1 and y_tmp<= 16 and x_tmp= 33 then
                         x_tmp:= x_tmp+ 1;
-                    elsif y_tmp>= 17 and y_tmp<= 64 and x_tmp<= 63 then
+                    elsif y_tmp>= 1 and y_tmp<= 32 and x_tmp<= 31 then
                         x_tmp:= x_tmp+ 1;
-                    elsif y_tmp>= 17 and y_tmp<= 64 and x_tmp= 64 then
-                        y_tmp:= 16;
-                        x_tmp:= x_tmp+ 1;
+                    elsif y_tmp>= 1 and y_tmp<= 32 and x_tmp= 32 then
+                        x_tmp:= 33;
+                        y_tmp:= (y_tmp+ 1)/2;
                     end if;
                 when others => null;
             end case;

@@ -16,11 +16,11 @@
 -- Quartus Prime generated Memory Initialization File (.mif)
 
 WIDTH=24;
-DEPTH=4096;
+DEPTH=1024;
 
 ADDRESS_RADIX=UNS;
 DATA_RADIX=HEX;
 
 CONTENT BEGIN
-	[0..4095]  :   FFFFFF;
+	[0..1023]  :   FFFFFF;
 END;

@@ -7,7 +7,7 @@ entity img_ram_test is
     port (
         clk_pix, rst: in std_logic;
         --data_out: out std_logic_vector(23 downto 0)
-        add_rd: buffer std_logic_vector(11 downto 0)
+        add_rd: buffer std_logic_vector(9 downto 0)
     );
 end entity img_ram_test;
 
@@ -65,7 +65,7 @@ begin
             --rd_clr<= '1';
         elsif rising_edge(clk_pix) then
             --rd_clr<= '0';
-            if add_rd= "111111111111" then
+            if add_rd= "1111111111" then
                 add_rd<= (others => '0');
             else
                 add_rd<= add_rd+ 1;

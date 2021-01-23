@@ -10,7 +10,7 @@ entity img_ctrl is
         x_point, y_point: in std_logic_vector(7 downto 0);
         key_code: in std_logic_vector(3 downto 0);
         color_num: in std_logic_vector(7 downto 0);
-        add_wr: out std_logic_vector(11 downto 0);
+        add_wr: out std_logic_vector(9 downto 0);
         img_data: out std_logic_vector(23 downto 0);
         wr_en: out std_logic
     );
@@ -116,8 +116,8 @@ architecture bhv of img_ctrl is
         constant color_32_b: std_logic_vector(7 downto 0):= x"48";
 begin
     img_ctrl: process(clk, rst)
-        variable x_tmp, y_tmp: integer range 1 to 70;
-        variable add_wr_tmp: integer range 0 to 4095;
+        variable x_tmp, y_tmp: integer range 1 to 35;
+        variable add_wr_tmp: integer range 0 to 1023;
         variable color_tmp: integer range 1 to 32;
         variable color_r, color_g, color_b: std_logic_vector(7 downto 0);
     begin
@@ -125,7 +125,7 @@ begin
             add_wr<= (others => '0');
             img_data<= (others => '1');
             wr_en<= '0';
-            x_tmp:= 65;
+            x_tmp:= 33;
             y_tmp:= 1;
             add_wr_tmp:= 0;
             color_tmp:= 1;
@@ -134,8 +134,8 @@ begin
             y_tmp:= conv_integer(y_point);
             color_tmp:= conv_integer(color_num);
             if key_code= "0001" then
-                if x_tmp>= 1 and x_tmp<= 64 and y_tmp>= 1 and y_tmp<= 64 then
-                    add_wr_tmp:= 64* (y_tmp- 1)+ (x_tmp- 1);
+                if x_tmp>= 1 and x_tmp<= 32 and y_tmp>= 1 and y_tmp<= 32 then
+                    add_wr_tmp:= 32* (y_tmp- 1)+ (x_tmp- 1);
                     case color_tmp is
                         when 1 =>
                             color_r:= color_1_r;
