@@ -389,3 +389,12 @@ top_smg_display.bdf
 top_smg_display.bsf
 ps2_read.vhd.bak
 fortest.ipregen.rpt
+video_pll_2.mif
+vga_signal_gen.vhd.bak
+ps2_decode.vhd.bak
+vga_signal_gen.bsf
+vga_signal_gen.bsf
+greybox_tmp/
+ser_to_diffser.cnx
+ps2_read_2.bsf
+SDC.sdc.bak
