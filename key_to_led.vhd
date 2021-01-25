@@ -5,6 +5,7 @@ use IEEE.numeric_std.all;
 entity key_to_led is
     port (
         key_code: in std_logic_vector(3 downto 0);
+        ctrl: in std_logic;
         clk, rst: in std_logic;
         led_0, led_1, led_2, led_3: out std_logic
     );
@@ -34,5 +35,13 @@ begin
         end if;
     end process led0;
     
+    led1: process(clk, rst)
+    begin
+        if rst = '0' then
+            led_1<= '0';
+        elsif rising_edge(clk) then
+            led_1<= ctrl;
+        end if;
+    end process led1;
     
 end architecture bhv;
