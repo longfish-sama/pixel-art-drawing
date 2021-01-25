@@ -1,6 +1,6 @@
-# pixel-drawing
+# pixel-art-drawing
 
-a FPGA based pixel drawing platform
+a FPGA based pixel art drawing platform
 
 一个基于FPGA系统的像素画绘制平台
 
