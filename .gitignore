@@ -398,3 +398,5 @@ greybox_tmp/
 ser_to_diffser.cnx
 ps2_read_2.bsf
 SDC.sdc.bak
+key_to_led.bsf
+key_to_led.vhd.bak
