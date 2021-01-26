@@ -32,26 +32,56 @@ begin
                         y_tmp:= y_tmp- 1;
                     end if;
                 when "0011" => -- key down
-                    if x_tmp>= 1 and x_tmp<= 32 and y_tmp<= 31 then
-                        y_tmp:= y_tmp+ 1;
-                    elsif x_tmp>= 33 and x_tmp<= 34 and y_tmp<= 15 then
+                    if ((x_tmp>= 1 and x_tmp<= 32 and y_tmp<= 31) or
+                        (x_tmp>= 33 and x_tmp<= 34 and y_tmp<= 15)) then
                         y_tmp:= y_tmp+ 1;
                     end if;
                 when "0100" => -- key left
                     if (x_tmp>= 2 and x_tmp<= 32) or x_tmp=34 then
                         x_tmp:= x_tmp- 1;
-                    elsif x_tmp= 33 and y_tmp>= 1 and y_tmp<= 16 then
+                    elsif x_tmp= 33 then
                         x_tmp:= 32;
                         y_tmp:= y_tmp*2- 1;
                     end if;
                 when "0101" => -- key right
-                    if y_tmp>= 1 and y_tmp<= 16 and x_tmp= 33 then
+                    if x_tmp= 33 or x_tmp<= 31 then
                         x_tmp:= x_tmp+ 1;
-                    elsif y_tmp>= 1 and y_tmp<= 32 and x_tmp<= 31 then
-                        x_tmp:= x_tmp+ 1;
-                    elsif y_tmp>= 1 and y_tmp<= 32 and x_tmp= 32 then
+                    elsif x_tmp= 32 then
                         x_tmp:= 33;
                         y_tmp:= (y_tmp+ 1)/2;
+                    end if;
+                when "0110" => --W, up*5
+                    if y_tmp>= 6 then
+                        y_tmp:= y_tmp- 5;
+                    elsif y_tmp<= 5 then
+                        y_tmp:= 1;
+                    end if;
+                when "0111" => --A, left*5
+                    if x_tmp>= 6 and x_tmp<= 32 then
+                        x_tmp:= x_tmp- 5;
+                    elsif x_tmp<= 5 then
+                        x_tmp:= 1;
+                    elsif x_tmp>= 33 and x_tmp<= 34 then
+                        x_tmp:= 32;
+                        y_tmp:= y_tmp*2- 1;
+                    end if;
+                when "1000" => --S, down*5
+                    if ((x_tmp>= 1 and x_tmp<= 32 and y_tmp<= 27) or
+                        (x_tmp>= 33 and x_tmp<= 34 and y_tmp<= 11)) then
+                        y_tmp:= y_tmp+ 5;
+                    elsif x_tmp>= 1 and x_tmp<= 32 and y_tmp>= 28 then
+                        y_tmp:= 32;
+                    elsif x_tmp>= 33 and x_tmp<= 34 and y_tmp>= 12 then
+                        y_tmp:= 16;
+                    end if;
+                when "1001" => --D, right*5
+                    if x_tmp>= 1 and x_tmp<= 27 then
+                        x_tmp:= x_tmp+ 5;
+                    elsif x_tmp>= 28 and x_tmp<= 32 then
+                        x_tmp:= 33;
+                        y_tmp:= (y_tmp+ 1)/2;
+                    elsif x_tmp>= 33 then
+                        x_tmp:= 34;
                     end if;
                 when others => null;
             end case;
