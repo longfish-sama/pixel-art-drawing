@@ -4,7 +4,7 @@ use IEEE.numeric_std.all;
 use IEEE.std_logic_arith.all;
 use IEEE.std_logic_unsigned.all;
 
-entity vga_signal_gen is
+entity vga_signal_gen2 is
     port (
         clk_pix, rst_n: in std_logic;
         x_point, y_point, color_num, grid_flag: in std_logic_vector(7 downto 0);
@@ -13,9 +13,9 @@ entity vga_signal_gen is
         img_ram_add: out std_logic_vector(9 downto 0);
         img_ram_data: in std_logic_vector(23 downto 0)
     );
-end entity vga_signal_gen;
+end entity vga_signal_gen2;
 
-architecture bhv of vga_signal_gen is
+architecture bhv of vga_signal_gen2 is
     signal hor_sync_tmp, ver_sync_tmp: std_logic; -- horizontal& vertical sync register
     signal hor_sync_delay_tmp, ver_sync_delay_tmp: std_logic; -- delay 1 clock of sync register
     signal hor_cnt: integer range 0 to 3000; -- horizontal counter
@@ -26,107 +26,107 @@ architecture bhv of vga_signal_gen is
     signal h_active_flag, v_active_flag: std_logic; -- horizontal& vertical video active flag
     signal video_active_flag: std_logic; -- video active (when horizontal active and vertical active)
     signal video_active_flag_delay: std_logic; -- delay 1 clock of video active flag
--- 800*600 at 60fps, clk_pix= 40MHz
-    constant h_active: integer:= 800; -- horizontal active time (pixels)
-    constant h_blank_fproch: integer:= 40; -- horizontal front porch (pixels)
-    constant h_blank_sync: integer:= 128; -- horizontal sync time(pixels)
-    constant h_blank_bproch: integer:= 88; -- horizontal back porch (pixels)
-    constant v_active: integer:= 600; -- vertical active Time (lines)
-    constant v_blank_fproch: integer:= 1; -- vertical front porch (lines)
-    constant v_blank_sync: integer:= 4; -- vertical sync time (lines)
-    constant v_blank_bproch: integer:= 23; -- vertical back porch (lines)
+-- 1920 at 60fps, clk_pix= 148.5MHz
+    constant h_active: integer:= 1920; -- horizontal active time (pixels)
+    constant h_blank_fproch: integer:= 88; -- horizontal front porch (pixels)
+    constant h_blank_sync: integer:= 44; -- horizontal sync time(pixels)
+    constant h_blank_bproch: integer:= 148; -- horizontal back porch (pixels)
+    constant v_active: integer:= 1080; -- vertical active Time (lines)
+    constant v_blank_fproch: integer:= 4; -- vertical front porch (lines)
+    constant v_blank_sync: integer:= 5; -- vertical sync time (lines)
+    constant v_blank_bproch: integer:= 36; -- vertical back porch (lines)
     constant h_total: integer:= h_active+ h_blank_fproch+ h_blank_sync+ h_blank_bproch; -- horizontal total time (pixels)
     constant v_total: integer:= v_active+ v_blank_fproch+ v_blank_sync+ v_blank_bproch; -- vertical total time (lines)
-    signal line_w: integer range 0 to 3:= 1;
-    constant dot_w: integer:= 1;
-    constant selector_w: integer:= 3;
--- 800*600 grid locs (calculated in Excel)
-    constant x1: integer:= 125; -- drawing area locs
-    constant x2: integer:= 138;
-    constant x3: integer:= 150;
-    constant x4: integer:= 163;
-    constant x5: integer:= 175;
-    constant x6: integer:= 188;
-    constant x7: integer:= 200;
-    constant x8: integer:= 213;
-    constant x9: integer:= 225;
-    constant x10: integer:= 238;
-    constant x11: integer:= 250;
-    constant x12: integer:= 263;
-    constant x13: integer:= 275;
-    constant x14: integer:= 288;
-    constant x15: integer:= 300;
-    constant x16: integer:= 313;
-    constant x17: integer:= 325;
-    constant x18: integer:= 338;
-    constant x19: integer:= 350;
-    constant x20: integer:= 363;
-    constant x21: integer:= 375;
-    constant x22: integer:= 388;
-    constant x23: integer:= 400;
-    constant x24: integer:= 413;
-    constant x25: integer:= 425;
-    constant x26: integer:= 438;
-    constant x27: integer:= 450;
-    constant x28: integer:= 463;
-    constant x29: integer:= 475;
-    constant x30: integer:= 488;
-    constant x31: integer:= 500;
-    constant x32: integer:= 513;
-    constant x1_color: integer:= 608; -- color area locs
-    constant x2_color: integer:= 633;
-    constant y1: integer:= 28; -- drawing area locs
-    constant y2: integer:= 44;
-    constant y3: integer:= 61;
-    constant y4: integer:= 78;
-    constant y5: integer:= 94;
-    constant y6: integer:= 111;
-    constant y7: integer:= 128;
-    constant y8: integer:= 144;
-    constant y9: integer:= 161;
-    constant y10: integer:= 178;
-    constant y11: integer:= 194;
-    constant y12: integer:= 211;
-    constant y13: integer:= 228;
-    constant y14: integer:= 244;
-    constant y15: integer:= 261;
-    constant y16: integer:= 278;
-    constant y17: integer:= 294;
-    constant y18: integer:= 311;
-    constant y19: integer:= 328;
-    constant y20: integer:= 344;
-    constant y21: integer:= 361;
-    constant y22: integer:= 378;
-    constant y23: integer:= 394;
-    constant y24: integer:= 411;
-    constant y25: integer:= 428;
-    constant y26: integer:= 444;
-    constant y27: integer:= 461;
-    constant y28: integer:= 478;
-    constant y29: integer:= 494;
-    constant y30: integer:= 511;
-    constant y31: integer:= 528;
-    constant y32: integer:= 544;
-    constant y1_color: integer:= 28; -- color area locs
-    constant y2_color: integer:= 61;
-    constant y3_color: integer:= 94;
-    constant y4_color: integer:= 128;
-    constant y5_color: integer:= 161;
-    constant y6_color: integer:= 194;
-    constant y7_color: integer:= 228;
-    constant y8_color: integer:= 261;
-    constant y9_color: integer:= 294;
-    constant y10_color: integer:= 328;
-    constant y11_color: integer:= 361;
-    constant y12_color: integer:= 394;
-    constant y13_color: integer:= 428;
-    constant y14_color: integer:= 461;
-    constant y15_color: integer:= 494;
-    constant y16_color: integer:= 528;
-    constant x_color_width: integer:= 17;
-    constant y_color_width: integer:= 22;
-    constant x_draw_width: integer:= 13;
-    constant y_draw_width: integer:= 17;
+    signal line_w: integer range 0 to 3:= 2;
+    constant dot_w: integer:= 2;
+    constant selector_w: integer:= 5;
+-- 1920*1080 grid locs (calculated in Excel)
+    constant x1: integer:= 300; -- drawing area locs
+    constant x2: integer:= 330;
+    constant x3: integer:= 360;
+    constant x4: integer:= 390;
+    constant x5: integer:= 420;
+    constant x6: integer:= 450;
+    constant x7: integer:= 480;
+    constant x8: integer:= 510;
+    constant x9: integer:= 540;
+    constant x10: integer:= 570;
+    constant x11: integer:= 600;
+    constant x12: integer:= 630;
+    constant x13: integer:= 660;
+    constant x14: integer:= 690;
+    constant x15: integer:= 720;
+    constant x16: integer:= 750;
+    constant x17: integer:= 780;
+    constant x18: integer:= 810;
+    constant x19: integer:= 840;
+    constant x20: integer:= 870;
+    constant x21: integer:= 900;
+    constant x22: integer:= 930;
+    constant x23: integer:= 960;
+    constant x24: integer:= 990;
+    constant x25: integer:= 1020;
+    constant x26: integer:= 1050;
+    constant x27: integer:= 1080;
+    constant x28: integer:= 1110;
+    constant x29: integer:= 1140;
+    constant x30: integer:= 1170;
+    constant x31: integer:= 1200;
+    constant x32: integer:= 1230;
+    constant x1_color: integer:= 1460; -- color area locs
+    constant x2_color: integer:= 1520;
+    constant y1: integer:= 50; -- drawing area locs
+    constant y2: integer:= 80;
+    constant y3: integer:= 110;
+    constant y4: integer:= 140;
+    constant y5: integer:= 170;
+    constant y6: integer:= 200;
+    constant y7: integer:= 230;
+    constant y8: integer:= 260;
+    constant y9: integer:= 290;
+    constant y10: integer:= 320;
+    constant y11: integer:= 350;
+    constant y12: integer:= 380;
+    constant y13: integer:= 410;
+    constant y14: integer:= 440;
+    constant y15: integer:= 470;
+    constant y16: integer:= 500;
+    constant y17: integer:= 530;
+    constant y18: integer:= 560;
+    constant y19: integer:= 590;
+    constant y20: integer:= 620;
+    constant y21: integer:= 650;
+    constant y22: integer:= 680;
+    constant y23: integer:= 710;
+    constant y24: integer:= 740;
+    constant y25: integer:= 770;
+    constant y26: integer:= 800;
+    constant y27: integer:= 830;
+    constant y28: integer:= 860;
+    constant y29: integer:= 890;
+    constant y30: integer:= 920;
+    constant y31: integer:= 950;
+    constant y32: integer:= 980;
+    constant y1_color: integer:= 50; -- color area locs
+    constant y2_color: integer:= 110;
+    constant y3_color: integer:= 170;
+    constant y4_color: integer:= 230;
+    constant y5_color: integer:= 290;
+    constant y6_color: integer:= 350;
+    constant y7_color: integer:= 410;
+    constant y8_color: integer:= 470;
+    constant y9_color: integer:= 530;
+    constant y10_color: integer:= 590;
+    constant y11_color: integer:= 650;
+    constant y12_color: integer:= 710;
+    constant y13_color: integer:= 770;
+    constant y14_color: integer:= 830;
+    constant y15_color: integer:= 890;
+    constant y16_color: integer:= 950;
+    constant x_color_width: integer:= 40;
+    constant y_color_width: integer:= 40;
+    constant x_draw_width: integer:= 30;
+    constant y_draw_width: integer:= 30;
 -- define rgb value of colors
     constant color_1_r: std_logic_vector(7 downto 0):= x"ff";
     constant color_1_g: std_logic_vector(7 downto 0):= x"ff";
@@ -230,9 +230,7 @@ architecture bhv of vga_signal_gen is
     constant color_sel_r: std_logic_vector(7 downto 0):= x"ff";
     constant color_sel_g: std_logic_vector(7 downto 0):= x"00";
     constant color_sel_b: std_logic_vector(7 downto 0):= x"00";
-    constant color_grid_r: std_logic_vector(7 downto 0):= x"cd";
-    constant color_grid_g: std_logic_vector(7 downto 0):= x"cd";
-    constant color_grid_b: std_logic_vector(7 downto 0):= x"cd";
+
 begin
     hor_sync<= hor_sync_delay_tmp;
     ver_sync<= ver_sync_delay_tmp;
@@ -383,10 +381,10 @@ begin
     line_w_ctrl: process(clk_pix, rst_n)
     begin
         if rst_n = '0' then
-            line_w<= 1;
+            line_w<= 2;
         elsif rising_edge(clk_pix) then
             if grid_flag= "11111111" then
-                line_w<= 1;
+                line_w<= 2;
             elsif grid_flag= "00000000" then
                 line_w<= 0;
             end if;
@@ -420,7 +418,7 @@ begin
                         -- color area pointer
                         (x_tmp> 32 and y_tmp<= 16 and
                         (x_cur_pos>= x_tmp*h_active/32- h_active*25/96- dot_w) and (y_cur_pos>= v_active/108+ y_tmp*v_active/18- dot_w) and
-                        (x_cur_pos<= x_tmp*h_active/32- h_active*25/96+ dot_w) and (y_cur_pos<= v_active/108+ y_tmp*v_active/18+ dot_w)) or
+                        (x_cur_pos<= x_tmp*h_active/32- h_active*25/96+ dot_w) and (y_cur_pos<= v_active/108+ y_tmp*v_active/18- dot_w)) or
                         -- color area selectors
                         (color_tmp>= 1 and color_tmp<= 32 and
                         (x_cur_pos>= h_active*73/96+ (1- (color_tmp rem 2))*h_active/32) and (x_cur_pos< h_active*25/32+ (1- (color_tmp rem 2))*h_active/32) and
@@ -494,9 +492,9 @@ begin
                         (y_cur_pos>= y16_color and y_cur_pos< y16_color+ line_w) or (y_cur_pos>= y16_color+ y_color_width and y_cur_pos< y16_color+ y_color_width+ line_w)) and
                         ((x_cur_pos>= x1_color and x_cur_pos<= x1_color+ x_color_width) or (x_cur_pos>= x2_color and x_cur_pos<= x2_color+ x_color_width))) then
                     -- grid
-                    vga_r_tmp<= color_grid_r;
-                    vga_g_tmp<= color_grid_g;
-                    vga_b_tmp<= color_grid_b;
+                    vga_r_tmp<= color_sel_r;
+                    vga_g_tmp<= color_sel_g;
+                    vga_b_tmp<= color_sel_b;
             -- elsif color area
                 elsif ((x_cur_pos>= x1_color) and (x_cur_pos<= x1_color+ x_color_width) and (y_cur_pos>= y1_color) and (y_cur_pos<= y1_color+ y_color_width)) then
                     vga_r_tmp<= color_1_r;
