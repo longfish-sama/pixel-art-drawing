@@ -117,9 +117,10 @@ architecture bhv of img_ctrl is
 begin
     img_ctrl: process(clk, rst)
         variable x_tmp, y_tmp: integer range 1 to 35;
-        variable add_wr_tmp: integer range 0 to 1023;
+        variable add_wr_tmp, add_clr_tmp: integer range 0 to 1023;
         variable color_tmp: integer range 1 to 32;
         variable color_r, color_g, color_b: std_logic_vector(7 downto 0);
+        variable clr_flag: integer range 0 to 1;
     begin
         if rst = '0' then
             add_wr<= (others => '0');
@@ -128,12 +129,14 @@ begin
             x_tmp:= 33;
             y_tmp:= 1;
             add_wr_tmp:= 0;
+            add_clr_tmp:= 0;
             color_tmp:= 1;
+            clr_flag:= 0;
         elsif rising_edge(clk) then
             x_tmp:= conv_integer(x_point);
             y_tmp:= conv_integer(y_point);
             color_tmp:= conv_integer(color_num);
-            if key_code= "0001" then
+            if key_code= "0001" and clr_flag= 0 then
                 if x_tmp>= 1 and x_tmp<= 32 and y_tmp>= 1 and y_tmp<= 32 then
                     add_wr_tmp:= 32* (y_tmp- 1)+ (x_tmp- 1);
                     case color_tmp is
@@ -270,6 +273,18 @@ begin
                     add_wr<= conv_std_logic_vector(add_wr_tmp, add_wr'length);
                     img_data<= color_r& color_g& color_b;    
                 end if;
+            elsif clr_flag= 1 then
+                add_wr<= conv_std_logic_vector(add_clr_tmp, add_wr'length);
+                wr_en<= '1';
+                img_data<= (others => '1');
+                if add_clr_tmp= 1023 then
+                    add_clr_tmp:= 0;
+                    clr_flag:= 0;
+                else
+                    add_clr_tmp:= add_clr_tmp+ 1;
+                end if;
+            elsif key_code= "1011" and clr_flag= 0 then
+                clr_flag:= 1;
             end if;
         end if;
     end process img_ctrl;
