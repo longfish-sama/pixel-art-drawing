@@ -400,3 +400,6 @@ ps2_read_2.bsf
 SDC.sdc.bak
 key_to_led.bsf
 key_to_led.vhd.bak
+img_ctrl.vhd.bak
+system_hdmi_only.bdf
+vga_signal_gen2.bsf
