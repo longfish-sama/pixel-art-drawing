@@ -15,8 +15,8 @@ end entity ps2_decode;
 -- |0001           -space  |0110           -W   |1011          -ctrl+D
 -- |0010           -up     |0111           -A   |1100          -ctrl+S
 -- |0011           -down   |1000           -S   |1101          -ctrl+O
--- |0100           -left   |1001           -D   |1110          -
--- |0101           -right  |1010           -G   |1111          -
+-- |0100           -left   |1001           -D   |1110          -E
+-- |0101           -right  |1010           -G   |1111          -B
 ----------------
 
 architecture bhv of ps2_decode is
@@ -73,6 +73,10 @@ begin
                         key_code_out<= "1001";
                     when "00110100" => --key G
                         key_code_out<= "1010";
+                    when "00100100" => --key E
+                        key_code_out<= "1110";
+                    when "00110010" => --key B
+                        key_code_out<= "1111";
                     when others =>
                         key_code_out<= "0000";
                 end case;
