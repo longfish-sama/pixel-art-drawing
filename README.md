@@ -71,13 +71,13 @@ a FPGA based pixel art drawing platform
 
     see prototype/layout-Model.png
 
-    ![layout-img](https://github.com/longfish-sama/pixel-art-drawing/blob/main/prototype/layout-Model.png)
+    ![layout-img](prototype/layout-Model.png)
 
     ### HTML based prototype
 
     see prototype/html/page_1.html
 
-    ![html-img](https://github.com/longfish-sama/pixel-art-drawing/blob/main/prototype/html_prototype.png)
+    ![html-img](prototype/html_prototype.png)
 
 
     ## 系统功能
