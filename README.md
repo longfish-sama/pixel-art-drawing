@@ -110,3 +110,24 @@ a FPGA based pixel art drawing platform
     5. 绘制信息保存（未实现）
 
     6. 绘制信息加载（未实现）
+
+    ## Reference
+
+    - 基于FPGA的HDMI接口设计方法_leo_xu_的博客-CSDN博客_hdmi接口时序 <https://blog.csdn.net/leo_xu_/article/details/107287905>
+    - PS2键盘接口协议_孤独剑的专栏-CSDN博客_ps2键盘协议 <https://blog.csdn.net/delphi308/article/details/7182542>
+    - TMDS协议_shanghaiqianlun的专栏-CSDN博客 <https://blog.csdn.net/shanghaiqianlun/article/details/6954500>
+    - <http://tinyvga.com/vga-timing>
+    - HDMI信号电平波形_haoyingbao的博客-CSDN博客_hdmi接口电平 <https://blog.csdn.net/haoyingbao/article/details/107810327>
+    - HDMI接口和TMDS传输标准详解_一个早起的程序员-CSDN博客 <https://blog.csdn.net/weiaipan1314/article/details/104173120>
+    - HDMI接口与TMDS协议_duxuranwodeai的博客-CSDN博客 <https://blog.csdn.net/duxuranwodeai/article/details/105710833>
+    - 逻辑电平之常见差分逻辑电平（4） | 电子创新网赛灵思社区 <http://xilinx.eetrend.com/content/2018/100016126.html>
+    - 刘焱, 周圣泽, 罗军, 等, “基于FPGA的并串转换电路硬件实现,” 电子技术应用, 卷 43, 编号 12, pp. 21-24，28, 2017. 
+    - Digital Display Working Group, “Digital Visual Interface Revision 1.0,” 1999.
+    - 什么是伪差分输入(Pseudodifferential input)? - National Instruments <https://digital.ni.com/public.nsf/allkb/D97426443C0E893B86257049004B5433>
+    - Internal Memory (RAM and ROM) User Guide <https://www.intel.cn/content/dam/altera-www/global/en_US/pdfs/literature/ug/ug_ram.pdf>
+    - 双倍数据速率I/O (ALTDDIO_IN、ALTDDIO_OUT和ALTDDIO_BIDIR) IP内核用户指南 <https://www.intel.cn/content/www/cn/zh/programmable/documentation/eis1415168884929.html>
+    - ALTIOBUF IP Core User Guide <https://www.intel.com/content/www/us/en/programmable/documentation/eis1414634258793.html>
+    - ALTPLL (Phase-Locked Loop) IP Core User Guide <https://www.intel.com/content/www/us/en/programmable/documentation/sam1412657969844.html>
+    - 徐向民, VHDL 数字系统设计, 北京: 电子工业出版社, 2015. 
+    - 王敏志, FPGA 设计实战演练（高级技巧篇）, 北京: 清华大学出版社, 2015. 
+    - 韩彬, 于潇宇 且 林海全, FPGA 设计技巧与案例开发详解, 北京: 电子工业出版社, 2019. 
